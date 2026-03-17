@@ -1,0 +1,510 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                      JAVA COMPREHENSIVE NOTES (CORE)                        ║
+║                 Theory + Examples + Deep-Dive Q&A                           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Goal of this file:
+• Build strong Java fundamentals with theory, examples, and interview-style depth.
+
+How to use:
+• Read sections 1→12 in order.
+• Use section 13 (Deep Questions) for revision + depth checks.
+
+
+TABLE OF CONTENTS
+══════════════════════════════════════════════════════════════════════════════
+
+1. Java Overview (JDK/JRE/JVM, bytecode)
+2. Program Structure (class, main, package, import)
+3. Data Types + Variables (primitives, wrappers, casting)
+4. Operators (incl. bitwise)
+5. Control Flow (if/switch)
+6. Loops (for/while/do-while/for-each)
+7. Methods (overloading, varargs, pass-by-value)
+8. Arrays (1D/2D, Arrays utilities)
+9. Strings (immutability, StringBuilder)
+10. OOP (4 pillars + real-life examples)
+11. Constructors (default constructor, this/super)
+12. Packages + Access Modifiers (why packages?)
+13. Deep Knowledge Questions (with answers)
+
+
+══════════════════════════════════════════════════════════════════════════════
+1) JAVA OVERVIEW
+══════════════════════════════════════════════════════════════════════════════
+
+What is Java?
+• A high-level, object-oriented, strongly-typed programming language.
+• Source code (.java) compiles to bytecode (.class).
+• Bytecode runs on the JVM → “Write Once, Run Anywhere” (with the same JVM).
+
+JDK vs JRE vs JVM:
+• JVM: runs bytecode (execution engine + JIT + GC).
+• JRE: JVM + standard libraries (runtime environment).
+• JDK: JRE + developer tools (javac, javadoc, debugger, etc.).
+
+Compilation + Execution flow:
+1) javac Hello.java  → Hello.class
+2) java Hello        → JVM loads class, verifies, runs main()
+
+
+══════════════════════════════════════════════════════════════════════════════
+2) PROGRAM STRUCTURE
+══════════════════════════════════════════════════════════════════════════════
+
+Minimum Java program:
+------------------------------------------------------------
+public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello, Java");
+    }
+}
+------------------------------------------------------------
+
+Key parts:
+• class: Java code lives inside classes.
+• main: entry point for console apps.
+• public static void:
+  - public: accessible to JVM
+  - static: no object needed to call main
+  - void: returns nothing
+• String[] args: command-line arguments.
+
+package and import:
+• package groups code, avoids name collisions.
+• import lets you refer to classes without writing full package names.
+
+
+══════════════════════════════════════════════════════════════════════════════
+3) DATA TYPES + VARIABLES
+══════════════════════════════════════════════════════════════════════════════
+
+Primitive types (store actual values):
+• byte, short, int, long
+• float, double
+• char
+• boolean
+
+Reference types (store references to objects):
+• String, arrays, classes, interfaces, enums
+
+Default values (for fields, not local variables):
+• numeric → 0, boolean → false, char → \u0000, references → null
+
+Local variables must be initialized before use:
+------------------------------------------------------------
+int x;          // local
+// System.out.println(x);  // ERROR: x not initialized
+------------------------------------------------------------
+
+Wrapper classes:
+• int → Integer, double → Double, char → Character, boolean → Boolean
+• Used in generics/collections (List<Integer>), and for utility methods.
+
+Casting:
+• Widening (safe): int → long → double
+• Narrowing (may lose data): double → int
+
+Example:
+------------------------------------------------------------
+double d = 10.9;
+int i = (int) d;   // i = 10
+------------------------------------------------------------
+
+
+══════════════════════════════════════════════════════════════════════════════
+4) OPERATORS
+══════════════════════════════════════════════════════════════════════════════
+
+Arithmetic: + - * / %
+Relational: < <= > >= == !=
+Logical: && || !
+Bitwise (integer types): & | ^ ~
+Shift: << >> >>>
+
+Common pitfall (integer division):
+------------------------------------------------------------
+System.out.println(3 / 2);      // 1
+System.out.println(3 / 2.0);    // 1.5
+------------------------------------------------------------
+
+
+══════════════════════════════════════════════════════════════════════════════
+5) CONTROL FLOW (if / switch)
+══════════════════════════════════════════════════════════════════════════════
+
+if / else:
+------------------------------------------------------------
+if (age >= 18) {
+    System.out.println("Adult");
+} else {
+    System.out.println("Minor");
+}
+------------------------------------------------------------
+
+switch:
+• Works well for discrete cases (int, char, String, enum).
+• Prefer switch when you have many equality checks.
+
+------------------------------------------------------------
+switch (day) {
+    case "Mon": System.out.println("Work"); break;
+    case "Sun": System.out.println("Rest"); break;
+    default:    System.out.println("Unknown");
+}
+------------------------------------------------------------
+
+
+══════════════════════════════════════════════════════════════════════════════
+6) LOOPS
+══════════════════════════════════════════════════════════════════════════════
+
+for:
+------------------------------------------------------------
+for (int k = 0; k < 3; k++) {
+    System.out.println(k);
+}
+------------------------------------------------------------
+
+while:
+------------------------------------------------------------
+int k = 0;
+while (k < 3) {
+    System.out.println(k);
+    k++;
+}
+------------------------------------------------------------
+
+do-while (runs at least once):
+------------------------------------------------------------
+int k = 0;
+do {
+    System.out.println(k);
+    k++;
+} while (k < 3);
+------------------------------------------------------------
+
+for-each (enhanced for):
+• Best for reading arrays/collections.
+• Not ideal when you need index.
+
+
+══════════════════════════════════════════════════════════════════════════════
+7) METHODS
+══════════════════════════════════════════════════════════════════════════════
+
+Why methods?
+• Reuse logic, reduce duplication, improve readability.
+
+Method overloading:
+• Same method name, different parameter list (count/type/order).
+• Decided at compile time.
+
+Varargs:
+------------------------------------------------------------
+static int sum(int... nums) {
+    int s = 0;
+    for (int n : nums) s += n;
+    return s;
+}
+// sum(1,2,3) or sum() both valid
+------------------------------------------------------------
+
+Java is pass-by-value:
+• For primitives: copies the value.
+• For objects: copies the reference (still pass-by-value).
+
+
+══════════════════════════════════════════════════════════════════════════════
+8) ARRAYS
+══════════════════════════════════════════════════════════════════════════════
+
+Array basics:
+• Fixed size.
+• Same-type elements.
+• 0-based indexing.
+
+Examples:
+------------------------------------------------------------
+int[] a = {3, 1, 2};
+java.util.Arrays.sort(a);
+System.out.println(java.util.Arrays.toString(a)); // [1, 2, 3]
+------------------------------------------------------------
+
+2D arrays:
+------------------------------------------------------------
+int[][] m = {
+    {1, 2},
+    {3, 4}
+};
+System.out.println(m[1][0]); // 3
+------------------------------------------------------------
+
+
+══════════════════════════════════════════════════════════════════════════════
+9) STRINGS
+══════════════════════════════════════════════════════════════════════════════
+
+Important facts:
+• String is immutable: operations create new String objects.
+• Prefer StringBuilder for many concatenations in a loop.
+
+== vs equals:
+• == compares references.
+• equals compares content (String overrides equals).
+
+Example:
+------------------------------------------------------------
+String s1 = "hi";
+String s2 = new String("hi");
+System.out.println(s1 == s2);       // false
+System.out.println(s1.equals(s2));  // true
+------------------------------------------------------------
+
+
+══════════════════════════════════════════════════════════════════════════════
+10) OOP (WITH REAL-LIFE EXAMPLES)
+══════════════════════════════════════════════════════════════════════════════
+
+Object = data + behavior.
+Class = blueprint of objects.
+
+Four pillars:
+
+1) Encapsulation ("capsule")
+• Keep data private, expose controlled methods.
+• Real-life: ATM machine → you interact via buttons; internal logic hidden.
+
+2) Abstraction ("show what, hide how")
+• Hide complex details, expose essential operations.
+• Real-life: Car dashboard → speedometer shows speed, not engine mechanics.
+
+3) Inheritance ("is-a")
+• Child class reuses/extends parent class.
+• Real-life: Dog is an Animal (Dog extends Animal).
+
+4) Polymorphism ("many forms")
+• Same interface, different implementations.
+• Real-life: Payment method → Cash, Card, UPI all “pay” differently.
+
+Composition vs Inheritance:
+• Composition ("has-a") is often better for flexibility.
+• Example: Car HAS-A Engine (composition) rather than Car IS-A Engine.
+
+
+══════════════════════════════════════════════════════════════════════════════
+11) CONSTRUCTORS (DEFAULT CONSTRUCTOR INCLUDED)
+══════════════════════════════════════════════════════════════════════════════
+
+What is a constructor?
+• Special method used to initialize objects.
+• Same name as class, no return type.
+
+Default constructor:
+• If you define NO constructors, compiler adds a no-arg constructor.
+• It calls super() as the first statement.
+• It initializes fields to default values.
+
+Why default constructor matters:
+• Lets you create objects without passing data initially.
+• Many frameworks/tools require a no-arg constructor (serialization, proxies, etc.).
+
+Example:
+------------------------------------------------------------
+class User {
+    String name;
+    // No constructor written → compiler creates User() {}
+}
+
+User u = new User();
+System.out.println(u.name); // null
+------------------------------------------------------------
+
+this vs super:
+• this refers to current object.
+• super refers to parent class part.
+
+Constructor chaining:
+------------------------------------------------------------
+class A {
+    A() { this(10); }
+    A(int x) { System.out.println(x); }
+}
+------------------------------------------------------------
+
+
+══════════════════════════════════════════════════════════════════════════════
+12) PACKAGES + ACCESS MODIFIERS
+══════════════════════════════════════════════════════════════════════════════
+
+Q: Why do we use package in Java?
+A:
+• Organization: group related classes (com.app.service, com.app.model).
+• Namespace: avoid class name conflicts.
+• Access control: package-private members visible only within the same package.
+• Maintainability: clearer structure and cleaner imports.
+
+Access modifiers (most common):
+• public    → accessible everywhere
+• protected → same package OR subclasses
+• (default) → same package only (package-private)
+• private   → same class only
+
+
+══════════════════════════════════════════════════════════════════════════════
+13) DEEP KNOWLEDGE QUESTIONS (WITH ANSWERS)
+══════════════════════════════════════════════════════════════════════════════
+
+Q1) What exactly happens when you write:  new ClassName() ?
+• Step 1: Class loading (if not already loaded)
+    - JVM ensures ClassName is loaded, linked (verify/prepare/resolve), then initialized.
+    - Static initializers run at class initialization time.
+• Step 2: Memory allocation on heap
+    - JVM allocates memory for the object (header + fields) in the heap.
+• Step 3: Default initialization
+    - All instance fields get default values first (0, false, null, etc.).
+• Step 4: Constructor chain executes
+    - The constructor runs, and the first statement is implicitly/explicitly super(...).
+    - Parent constructors run before child constructor body.
+• Step 5: Reference returned
+    - The expression returns a reference to the heap object.
+
+Mini example (constructor order):
+------------------------------------------------------------
+class Parent {
+        Parent() { System.out.println("Parent"); }
+}
+class Child extends Parent {
+        Child() { System.out.println("Child"); }
+}
+// new Child(); prints:
+// Parent
+// Child
+------------------------------------------------------------
+
+Q2) Is Java pass-by-reference?
+• No. Java is always pass-by-value.
+• For primitives: a copy of the value is passed.
+• For objects: a copy of the reference is passed (still a value).
+    - You can mutate the object via the copied reference.
+    - You cannot change the caller’s variable to point to a new object.
+
+Example:
+------------------------------------------------------------
+static void change(int x) { x = 99; }
+static void changeRef(StringBuilder sb) { sb.append("!"); }
+static void reassign(StringBuilder sb) { sb = new StringBuilder("new"); }
+
+int a = 10; change(a);                 // a is still 10
+StringBuilder b = new StringBuilder("hi");
+changeRef(b);                           // b becomes "hi!"
+reassign(b);                            // b is still "hi!" (caller not reassigned)
+------------------------------------------------------------
+
+Q3) Why is String immutable?
+• Security
+    - Strings are used for class names, file paths, URLs, credentials, etc.
+    - If mutable, a value could change after a security check.
+• String pool (memory optimization)
+    - String literals are reused; immutability makes sharing safe.
+• Thread safety
+    - Immutable objects can be shared across threads without synchronization.
+• Stable hashing
+    - Strings are common HashMap keys; cached hashCode remains correct.
+• Design simplicity
+    - Fewer bugs because “value never changes”.
+
+Q4) Why must you override hashCode() when overriding equals()?
+• Hash-based collections (HashMap/HashSet) use hashCode() to pick a bucket first.
+• Contract:
+    - If a.equals(b) is true, then a.hashCode() MUST equal b.hashCode().
+    - If hashCodes are equal, equals may still be false (collision is allowed).
+• If you override equals() but not hashCode(), equal objects can land in
+    different buckets → lookups fail and duplicates appear in sets.
+
+Mini example (problem):
+• Two Person objects have same id.
+• equals compares id.
+• If hashCode is not overridden, HashSet may store both as “different”.
+
+Q5) What is the difference between == and equals()?
+• For primitives:
+    - == compares actual values (5 == 5 is true).
+• For objects:
+    - == compares references (same object in memory).
+    - equals() compares logical equality (content) when the class overrides it.
+
+Rule of thumb:
+• Use equals() for Strings and most objects.
+• Use == only when you truly want identity comparison.
+
+Q6) What is method overloading vs overriding?
+• Overloading (compile-time polymorphism)
+    - Same method name, different parameter list.
+    - Chosen by compiler based on reference type + arguments.
+    - Return type alone cannot overload.
+• Overriding (runtime polymorphism)
+    - Subclass provides its own implementation with same signature.
+    - Chosen at runtime based on the actual object type.
+
+Example:
+------------------------------------------------------------
+class A { void show(int x) {} }
+class B extends A { @Override void show(int x) {} }
+// B overrides show(int)
+------------------------------------------------------------
+
+Q7) Why do we make fields private and use getters/setters?
+• Encapsulation
+    - Prevent direct uncontrolled changes to internal state.
+• Validation
+    - Enforce rules (e.g., age cannot be negative).
+• Maintain invariants
+    - Keep object always in a valid state.
+• Flexibility
+    - You can change internal representation later without changing external API.
+• Read-only or write-only control
+    - Provide only getter or only setter when required.
+
+Q8) When should you prefer composition over inheritance?
+• Prefer composition when “has-a” relationship fits better than “is-a”.
+• Behavior should be swappable at runtime
+    - Example: PaymentService uses PaymentStrategy (UPI/Card/Cash).
+• Avoid fragile base class problem
+    - Parent changes can break child classes.
+• Reduce deep inheritance trees
+    - Composition keeps design flatter and easier to maintain.
+
+Simple idea:
+• Inheritance: class Car extends Vehicle
+• Composition: class Car { Engine engine; }
+
+Q9) What is the role of default constructor?
+• If you define NO constructors, compiler generates a no-arg default constructor.
+• It allows:
+    - Easy object creation without initial data.
+    - Framework usage (reflection-based creation).
+    - Deserialization/proxy tools in many ecosystems.
+• Important rule:
+    - If you define ANY constructor, compiler will NOT generate the default one.
+
+Example:
+------------------------------------------------------------
+class A { A(int x) {} }
+// new A();  // ERROR: no default constructor
+------------------------------------------------------------
+
+Q10) Why does Java have both abstract class and interface?
+• Interface (contract / capability)
+    - Defines what a type can do.
+    - Supports multiple inheritance of type (a class can implement many interfaces).
+    - Good for decoupling and flexible APIs.
+• Abstract class (shared base implementation)
+    - Can hold shared state (fields) and partial implementation.
+    - Useful when classes share code + common behavior.
+
+Practical guideline:
+• Use interface when you want a common API across unrelated classes.
+• Use abstract class when you want to reuse code/state across closely related classes.
+
+End.

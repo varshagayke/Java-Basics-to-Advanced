@@ -1,0 +1,1030 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        ADVANCED JAVA CONCEPTS                               ║
+║                      Generics, Annotations, Lambdas                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS:
+═════════════════════════════════════════════════════════════════════════════
+
+1. Generics
+2. Annotations
+3. Lambda Expressions (Java 8)
+4. Functional Interfaces
+5. Stream API (Java 8)
+6. Optional
+7. Method References
+8. Default Methods in Interfaces
+9. Collections Internals (List/Map/Set)
+10. Concurrency Basics (Threads, Executors)
+11. JVM Memory Model + Garbage Collection
+12. Reflection + Class Loading
+13. Serialization (and pitfalls)
+14. Deep Interview Questions
+
+
+═════════════════════════════════════════════════════════════════════════════
+1. GENERICS
+═════════════════════════════════════════════════════════════════════════════
+
+What are Generics?
+──────────────────
+Provide type safety to collections
+Allow write generic classes, interfaces, methods
+Eliminate cast operators
+Catch type errors at compile time
+
+Benefits:
+✓ Type safety - errors caught at compile time
+✓ No typecasting needed
+✓ More readable code
+✓ Performance improvement
+
+Generic Class:
+───────────────
+public class Box<T> {
+    private T content;
+    
+    public void put(T item) {
+        this.content = item;
+    }
+    
+    public T get() {
+        return content;
+    }
+}
+
+Usage:
+Box<String> stringBox = new Box<>();
+stringBox.put("Hello");
+String value = stringBox.get();  // No casting needed
+
+Box<Integer> intBox = new Box<>();
+intBox.put(123);
+Integer number = intBox.get();
+
+Type Parameter Naming Convention:
+T   - Type
+K   - Key
+V   - Value
+E   - Element
+N   - Number
+S,U,V - Other types
+
+Multiple Type Parameters:
+public class Pair<K, V> {
+    private K key;
+    private V value;
+    
+    public Pair(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+    
+    public K getKey() { return key; }
+    public V getValue() { return value; }
+}
+
+Usage:
+Pair<String, Integer> pair = new Pair<>("Age", 25);
+System.out.println(pair.getKey() + ": " + pair.getValue());
+
+Generic Method:
+────────────────
+public class Utility {
+    public static <T> void print(T element) {
+        System.out.println(element);
+    }
+    
+    public static <K, V> void print(K key, V value) {
+        System.out.println(key + " : " + value);
+    }
+}
+
+Usage:
+Utility.<String>print("Hello");
+Utility.print("Hello");  // Type inferred
+Utility.print("Key", 123);
+
+Bounded Type Parameters:
+────────────────────────
+Restrict type parameter to specific types
+
+Upper Bound (extends):
+public class NumberBox<T extends Number> {
+    // T must be Number or subclass
+}
+
+Usage:
+NumberBox<Integer> intBox = new NumberBox<>();  // OK
+NumberBox<Double> doubleBox = new NumberBox<>();  // OK
+NumberBox<String> stringBox = new NumberBox<>();   // Compile error!
+
+Multiple Bounds:
+public <T extends Number & Comparable<T>> void compare(T a, T b) {
+    // T must extend Number AND implement Comparable
+}
+
+Lower Bound (super):
+public void addNumbers(List<? super Integer> list) {
+    // Accepts List of Integer or any superclass
+    // Used for input parameters
+}
+
+Wildcards:
+──────────
+? : Unknown type
+<? extends A> : Upper bound wildcard
+<? super A>   : Lower bound wildcard
+
+Example:
+List<?> list = new ArrayList<>();  // Unknown element type
+// list.add("String");  // ERROR: can't add (except null) because element type is unknown
+list.add(null);          // OK
+Object first = list.get(0); // Reading is allowed (type is Object)
+
+List<? extends Number> numList = new ArrayList<Integer>();
+for (Number n : numList) {
+    System.out.println(n);
+}
+
+Type Erasure:
+──────────────
+Java erases generic types at runtime
+Generic info not available at runtime
+
+Box<String> stringBox = new Box<>();
+Box<Integer> intBox = new Box<>();
+
+At runtime:
+• Both become Box (no generic info)
+• No runtime type checking
+• Can't use generics with primitive types
+
+Generic Limitations:
+────────────────────
+❌ Can't instantiate type parameter:
+new T();  // ERROR
+
+✓ Solution: Use factory or reflection
+
+❌ Can't create array of generic type:
+T[] array = new T[10];  // ERROR
+
+✓ Solution: Use List instead
+
+❌ Can't use with primitive types:
+Box<int> intBox = new Box<>();  // ERROR
+
+✓ Solution: Use wrapper classes
+Box<Integer> intBox = new Box<>();  // OK
+
+Common Generic Patterns:
+────────────────────────
+Generic DAO:
+public class GenericDAO<T> {
+    private List<T> data = new ArrayList<>();
+    
+    public void add(T item) {
+        data.add(item);
+    }
+    
+    public T getById(int id) {
+        return data.get(id);
+    }
+    
+    public List<T> getAll() {
+        return data;
+    }
+}
+
+Usage:
+GenericDAO<User> userDAO = new GenericDAO<>();
+GenericDAO<Product> productDAO = new GenericDAO<>();
+
+Builder Pattern with Generics:
+public class Builder<T> {
+    public Builder<T> with(Consumer<T> consumer) {
+        return this;
+    }
+}
+
+
+═════════════════════════════════════════════════════════════════════════════
+2. ANNOTATIONS
+═════════════════════════════════════════════════════════════════════════════
+
+What are Annotations?
+─────────────────────
+Provide metadata (extra information) about code
+Not part of code execution
+Processed at compile time or runtime
+
+Common Built-in Annotations:
+
+@Override:
+Indicates method overrides superclass method
+Catches errors if method signature doesn't match
+
+public class Dog extends Animal {
+    @Override
+    public void bark() {
+        System.out.println("Woof");
+    }
+}
+
+@Deprecated:
+Indicates element is outdated
+Still works but shouldn't be used
+
+@Deprecated
+public void oldMethod() {
+    // Will generate warning if used
+}
+
+@FunctionalInterface:
+Indicates interface is functional (single method)
+
+@FunctionalInterface
+public interface Calculator {
+    int calculate(int a, int b);
+}
+
+@SuppressWarnings:
+Tells compiler to suppress specific warnings
+
+@SuppressWarnings("unchecked")
+public void castList() {
+    List<String> list = (List<String>) new ArrayList();
+}
+
+Custom Annotations:
+────────────────────
+@interface MyAnnotation {
+    String value();
+    int priority() default 1;
+}
+
+Usage:
+@MyAnnotation(value = "Important", priority = 5)
+public class MyClass {
+}
+
+Annotation with Retention:
+@Retention(RetentionPolicy.RUNTIME)  // Available at runtime
+@Target(ElementType.METHOD)  // Can be applied to methods
+public @interface Log {
+    String message() default "Method called";
+}
+
+Meta-annotations:
+• @Retention: How long annotation retained
+• @Target: Where annotation can be applied
+• @Documented: Include in JavaDoc
+• @Inherited: Inherited by subclasses
+
+
+═════════════════════════════════════════════════════════════════════════════
+3. LAMBDA EXPRESSIONS (Java 8)
+═════════════════════════════════════════════════════════════════════════════
+
+What is Lambda Expression?
+──────────────────────────
+Anonymous function (no name)
+Concise syntax for implementing interfaces
+Makes code more readable and concise
+
+Syntax:
+(parameters) -> { body }
+
+Examples:
+// No parameters
+() -> System.out.println("Hello");
+
+// One parameter
+(x) -> x * 2;
+or
+x -> x * 2;  // Parentheses optional for single parameter
+
+// Multiple parameters
+(x, y) -> x + y;
+
+// Multiple statements
+(x, y) -> {
+    int sum = x + y;
+    return sum * 2;
+};
+
+Lambda with Collections:
+─────────────────────────
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+
+// Traditional loop
+for (Integer num : numbers) {
+    System.out.println(num);
+}
+
+// Lambda expression
+numbers.forEach(num -> System.out.println(num));
+
+Sorting with Lambda:
+List<String> names = Arrays.asList("Alice", "Bob", "Charlie");
+
+// Traditional comparator
+Collections.sort(names, new Comparator<String>() {
+    @Override
+    public int compare(String a, String b) {
+        return a.compareTo(b);
+    }
+});
+
+// Lambda expression
+Collections.sort(names, (a, b) -> a.compareTo(b));
+
+Filter with Lambda:
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+
+// Keep even numbers
+List<Integer> evenNumbers = new ArrayList<>();
+for (Integer num : numbers) {
+    if (num % 2 == 0) {
+        evenNumbers.add(num);
+    }
+}
+
+// Using stream with lambda
+List<Integer> evenNumbers = numbers.stream()
+    .filter(num -> num % 2 == 0)
+    .collect(Collectors.toList());
+
+Lambda Benefits:
+────────────────
+✓ Reduces boilerplate code
+✓ More readable
+✓ Supports functional programming
+✓ Better performance (sometimes)
+✓ Simpler multithreading
+
+Limitations:
+❌ Can't have multiple statements without curly braces
+❌ No type inference for complex cases
+❌ No return statement if using arrow only
+❌ Must implement functional interface
+
+
+═════════════════════════════════════════════════════════════════════════════
+4. FUNCTIONAL INTERFACES
+═════════════════════════════════════════════════════════════════════════════
+
+What is Functional Interface?
+─────────────────────────────
+Interface with exactly one abstract method
+Can have default/static methods
+Used with lambda expressions
+
+Built-in Functional Interfaces (java.util.function):
+
+Supplier<T>:
+Produces value, no input
+T get();
+
+Example:
+Supplier<String> supplier = () -> "Hello";
+String value = supplier.get();
+
+Consumer<T>:
+Takes value, no output
+void accept(T t);
+
+Example:
+Consumer<String> printer = System.out::println;
+printer.accept("Hello");
+
+Predicate<T>:
+Tests value, returns boolean
+boolean test(T t);
+
+Example:
+Predicate<Integer> isEven = n -> n % 2 == 0;
+boolean result = isEven.test(4);  // true
+
+Function<T, R>:
+Transforms input to output
+R apply(T t);
+
+Example:
+Function<Integer, String> converter = n -> "Number: " + n;
+String result = converter.apply(42);
+
+BiFunction<T, U, R>:
+Takes two inputs, returns output
+R apply(T t, U u);
+
+Example:
+BiFunction<Integer, Integer, Integer> adder = (a, b) -> a + b;
+int result = adder.apply(5, 3);
+
+UnaryOperator<T>:
+Operates on value, returns same type
+T apply(T t);
+
+Example:
+UnaryOperator<Integer> square = n -> n * n;
+int result = square.apply(4);  // 16
+
+BinaryOperator<T>:
+Operates on two values, returns same type
+T apply(T t1, T t2);
+
+Example:
+BinaryOperator<Integer> multiply = (a, b) -> a * b;
+int result = multiply.apply(3, 4);  // 12
+
+Custom Functional Interface:
+────────────────────────────
+@FunctionalInterface
+public interface Processor {
+    int process(int x);
+}
+
+// Or without explicitly processing
+interface Formatter {
+    String format(String input);
+}
+
+Usage:
+Processor processor = x -> x * 2;
+int result = processor.process(5);  // 10
+
+Formatter formatter = str -> str.toUpperCase();
+String result = formatter.format("hello");  // HELLO
+
+
+═════════════════════════════════════════════════════════════════════════════
+5. STREAM API (Java 8)
+═════════════════════════════════════════════════════════════════════════════
+
+What is Stream?
+────────────────
+Allows processing collections in functional style
+Lazy evaluation (processes only when needed)
+Can be parallel
+
+Stream is NOT collection - it's pipeline of operations
+
+Creating Streams:
+─────────────────
+From Collection:
+List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+Stream<Integer> stream = list.stream();
+
+From Array:
+int[] array = {1, 2, 3, 4, 5};
+IntStream stream = Arrays.stream(array);
+
+From Range:
+IntStream stream = IntStream.range(1, 5);  // 1, 2, 3, 4
+
+Stream.of():
+Stream<Integer> stream = Stream.of(1, 2, 3, 4, 5);
+
+Intermediate Operations:
+────────────────────────
+Return another stream (lazy evaluation)
+
+filter():
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
+List<Integer> evenNumbers = numbers.stream()
+    .filter(n -> n % 2 == 0)
+    .collect(Collectors.toList());
+
+map():
+List<String> names = Arrays.asList("Alice", "Bob", "Charlie");
+List<Integer> lengths = names.stream()
+    .map(String::length)
+    .collect(Collectors.toList());
+
+flatMap():
+List<List<Integer>> lists = Arrays.asList(
+    Arrays.asList(1, 2),
+    Arrays.asList(3, 4)
+);
+List<Integer> flattened = lists.stream()
+    .flatMap(List::stream)
+    .collect(Collectors.toList());
+
+distinct():
+List<Integer> numbers = Arrays.asList(1, 2, 2, 3, 3);
+List<Integer> unique = numbers.stream()
+    .distinct()
+    .collect(Collectors.toList());
+
+sorted():
+List<Integer> numbers = Arrays.asList(3, 1, 4, 1, 5);
+List<Integer> sorted = numbers.stream()
+    .sorted()
+    .collect(Collectors.toList());
+
+skip() and limit():
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+List<Integer> result = numbers.stream()
+    .skip(2)        // Skip first 2 elements
+    .limit(2)       // Take next 2 elements
+    .collect(Collectors.toList());  // [3, 4]
+
+Terminal Operations:
+─────────────────────
+End stream pipeline, produce result
+
+forEach():
+numbers.stream().forEach(System.out::println);
+
+collect():
+List<Integer> result = numbers.stream()
+    .filter(n -> n > 2)
+    .collect(Collectors.toList());
+
+reduce():
+int sum = numbers.stream().reduce(0, Integer::sum);
+int product = numbers.stream().reduce(1, (a, b) -> a * b);
+
+count():
+long count = numbers.stream().count();
+
+findFirst():
+Optional<Integer> first = numbers.stream().findFirst();
+
+findAny():
+Optional<Integer> any = numbers.stream().findAny();
+
+anyMatch():
+boolean hasEven = numbers.stream().anyMatch(n -> n % 2 == 0);
+
+allMatch():
+boolean allPositive = numbers.stream().allMatch(n -> n > 0);
+
+noneMatch():
+boolean noZero = numbers.stream().noneMatch(n -> n == 0);
+
+Stream Collectors:
+──────────────────
+Convert stream to different forms
+
+toList():
+List<Integer> list = stream.collect(Collectors.toList());
+
+toSet():
+Set<Integer> set = stream.collect(Collectors.toSet());
+
+toMap():
+List<String> names = Arrays.asList("Alice", "Bob");
+Map<String, Integer> map = names.stream()
+    .collect(Collectors.toMap(
+        name -> name,
+        String::length
+    ));
+
+groupingBy():
+List<Person> people = Arrays.asList(...);
+Map<String, List<Person>> byCity = people.stream()
+    .collect(Collectors.groupingBy(Person::getCity));
+
+partitioningBy():
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+Map<Boolean, List<Integer>> byParity = numbers.stream()
+    .collect(Collectors.partitioningBy(n -> n % 2 == 0));
+
+Stream Example:
+────────────────
+List<String> names = Arrays.asList("Alice", "Bob", "Charlie", "David");
+
+String result = names.stream()
+    .filter(name -> name.length() > 3)      // Filter names longer than 3
+    .map(String::toUpperCase)               // Convert to uppercase
+    .sorted()                               // Sort alphabetically
+    .collect(Collectors.joining(", "));     // Join with comma
+
+Output: ALICE, CHARLIE, DAVID
+
+Parallel Streams:
+──────────────────
+For performance with large collections
+
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+
+// Sequential (default)
+numbers.stream().forEach(System.out::println);
+
+// Parallel
+numbers.parallelStream().forEach(System.out::println);
+
+
+═════════════════════════════════════════════════════════════════════════════
+6. OPTIONAL
+═════════════════════════════════════════════════════════════════════════════
+
+What is Optional?
+──────────────────
+Wrapper for value that may or may not exist
+Prevents NullPointerException
+Forces explicit null handling
+
+Creating Optional:
+
+Optional.of(value):
+Optional<String> optional = Optional.of("Hello");
+// Throws exception if value is null
+
+Optional.ofNullable(value):
+Optional<String> optional = Optional.ofNullable(null);
+// Accepts null value
+
+Optional.empty():
+Optional<String> optional = Optional.empty();
+// Creates empty Optional
+
+Checking if Present:
+
+isPresent():
+if (optional.isPresent()) {
+    System.out.println(optional.get());
+}
+
+ifPresentOrElse() [Java 9+]:
+optional.ifPresentOrElse(
+    value -> System.out.println(value),
+    () -> System.out.println("Empty")
+);
+
+orElse():
+String value = optional.orElse("default");
+
+orElseGet():
+String value = optional.orElseGet(() -> "default");
+
+orElseThrow():
+String value = optional.orElseThrow();
+// Throws NoSuchElementException if empty
+
+get():
+String value = optional.get();
+// Throws NoSuchElementException if empty
+
+Transforming Optional:
+
+map():
+Optional<Integer> length = optional.map(String::length);
+
+flatMap():
+Optional<Integer> parsed = optional.flatMap(str -> {
+    try {
+        return Optional.of(Integer.parseInt(str));
+    } catch (NumberFormatException e) {
+        return Optional.empty();
+    }
+});
+
+filter():
+Optional<String> filtered = optional.filter(str -> str.length() > 3);
+
+Optional Best Practices:
+────────────────────────
+✓ Use for return values that might be null
+✓ Never use as method parameters
+✓ Don't use Optional for collections
+✓ Use Optional with streams
+
+Bad:
+public void process(Optional<String> name) { }
+
+Good:
+public Optional<String> findName() { }
+
+Stream with Optional:
+────────────────────
+List<Optional<String>> optionalNames = Arrays.asList(...);
+
+List<String> names = optionalNames.stream()
+    .flatMap(Optional::stream)  // Java 9+
+    .collect(Collectors.toList());
+
+
+═════════════════════════════════════════════════════════════════════════════
+7. METHOD REFERENCES
+═════════════════════════════════════════════════════════════════════════════
+
+What is Method Reference?
+──────────────────────────
+Shorthand syntax for lambda expressions
+Refers to existing method
+More readable
+
+Syntax:
+Class::staticMethod       // Static method
+object::instanceMethod   // Instance method
+Class::new              // Constructor
+
+
+Example:
+Traditional:
+list.forEach(s -> System.out.println(s));
+
+Method Reference:
+list.forEach(System.out::println);
+
+Types of Method References:
+
+1. Static Method Reference:
+Traditional:
+Function<Integer, String> converter = i -> String.valueOf(i);
+
+Method Reference:
+Function<Integer, String> converter = String::valueOf;
+
+Usage:
+String result = converter.apply(42);
+
+2. Instance Method Reference:
+Traditional:
+list.forEach(s -> System.out.println(s));
+
+Method Reference:
+PrintStream out = System.out;
+list.forEach(out::println);
+
+3. Constructor Reference:
+Traditional:
+Function<String, Integer> creator = s -> Integer.valueOf(s);
+
+Method Reference:
+Function<String, Integer> creator = Integer::valueOf;
+
+Usage:
+List<String> strings = Arrays.asList("1", "2", "3");
+List<Integer> integers = strings.stream()
+    .map(Integer::valueOf)
+    .collect(Collectors.toList());
+
+4. Instance Method Reference (from Class):
+Traditional:
+list.stream().map(s -> s.toUpperCase()).collect(Collectors.toList());
+
+Method Reference:
+list.stream().map(String::toUpperCase).collect(Collectors.toList());
+
+
+═════════════════════════════════════════════════════════════════════════════
+8. DEFAULT METHODS IN INTERFACES (Java 8)
+═════════════════════════════════════════════════════════════════════════════
+
+What are Default Methods?
+──────────────────────────
+Provide default implementation in interface
+Classes can override or use default
+Backward compatible with existing code
+
+Syntax:
+default returnType methodName() {
+    // Implementation
+}
+
+Example:
+public interface Vehicle {
+    void start();
+    
+    default void stop() {
+        System.out.println("Vehicle stopping");
+    }
+}
+
+public class Car implements Vehicle {
+    @Override
+    public void start() {
+        System.out.println("Car starting");
+    }
+    
+    // Can override default method or use it as-is
+}
+
+Usage:
+Car car = new Car();
+car.start();  // "Car starting"
+car.stop();   // "Vehicle stopping" (uses default)
+
+Multiple Inheritance Issue:
+────────────────────────────
+What if class implements two interfaces with same default method?
+
+interface Interface1 {
+    default void test() {
+        System.out.println("Interface1");
+    }
+}
+
+interface Interface2 {
+    default void test() {
+        System.out.println("Interface2");
+    }
+}
+
+public class MyClass implements Interface1, Interface2 {
+    @Override
+    public void test() {
+        // Must explicitly implement
+        Interface1.super.test();  // Can call specific interface
+    }
+}
+
+Static Methods in Interfaces:
+──────────────────────────────
+Starting Java 8, interfaces can have static methods
+
+public interface Utility {
+    static void printInfo() {
+        System.out.println("Static method in interface");
+    }
+}
+
+Usage:
+Utility.printInfo();  // Called on interface name
+
+Not inherited by implementing classes:
+public class MyClass implements Utility {
+    // Can't override static method
+    // Must call as Utility.printInfo()
+}
+
+═════════════════════════════════════════════════════════════════════════════
+9. COLLECTIONS INTERNALS (List / Set / Map)
+═════════════════════════════════════════════════════════════════════════════
+
+Why learn internals?
+• Helps choose correct data structure.
+• Explains time complexity and common bugs (hashCode/equals, concurrency).
+
+ArrayList vs LinkedList:
+• ArrayList
+    - Backed by resizable array
+    - get(i): O(1)
+    - add(end): amortized O(1)
+    - insert/remove in middle: O(n) due to shifting
+• LinkedList
+    - Doubly-linked list
+    - get(i): O(n)
+    - insert/remove at ends: O(1)
+
+HashMap (high level):
+• Key → hashCode() → bucket index → store entry
+• If collisions: stores multiple entries in same bucket
+• Correctness depends on equals() + hashCode() contract
+
+Key rules for keys:
+✓ If a.equals(b) is true → a.hashCode() == b.hashCode() MUST be true
+✓ Keys should be immutable (or behave immutable while used as key)
+
+Fail-fast iterators:
+• Most standard collections throw ConcurrentModificationException
+    if modified structurally during iteration (except via iterator.remove()).
+
+Comparable vs Comparator:
+• Comparable: natural ordering inside class (compareTo)
+• Comparator: external/custom ordering (compare)
+
+
+═════════════════════════════════════════════════════════════════════════════
+10. CONCURRENCY BASICS (Threads, Executors)
+═════════════════════════════════════════════════════════════════════════════
+
+Core idea:
+• Concurrency = doing multiple tasks overlapping in time.
+• Parallelism = literally running at the same time (multi-core).
+
+Thread creation:
+• Extend Thread (rarely recommended)
+• Implement Runnable (common)
+• Implement Callable<V> (returns value + can throw checked exceptions)
+
+Prefer Executors (thread pools):
+------------------------------------------------------------
+ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(4);
+
+java.util.concurrent.Future<Integer> f = pool.submit(() -> 40 + 2);
+System.out.println(f.get());
+
+pool.shutdown();
+------------------------------------------------------------
+
+synchronized vs volatile (very important):
+• synchronized: mutual exclusion + happens-before (visibility)
+• volatile: visibility + ordering for a single variable, NOT atomic increments
+
+Common pitfalls:
+• Race condition: two threads update shared data without coordination
+• Deadlock: A waits for B while B waits for A (lock ordering issue)
+
+
+═════════════════════════════════════════════════════════════════════════════
+11. JVM MEMORY MODEL + GARBAGE COLLECTION
+═════════════════════════════════════════════════════════════════════════════
+
+Runtime memory (simplified):
+• Stack: method frames, local primitives, references (per thread)
+• Heap: objects/arrays (shared)
+• Metaspace: class metadata (since Java 8, replaces PermGen)
+
+Garbage Collection basics:
+• GC frees unreachable objects in heap.
+• "Unreachable" = no path from GC Roots (threads, static refs, etc.).
+
+Common memory leak patterns:
+• Static collections storing objects forever
+• Listeners/callbacks not removed
+• Caches without eviction
+
+Reference types (java.lang.ref):
+• Strong (default)
+• Soft (cache-like)
+• Weak (e.g., WeakHashMap keys)
+• Phantom (advanced cleanup)
+
+
+═════════════════════════════════════════════════════════════════════════════
+12. REFLECTION + CLASS LOADING
+═════════════════════════════════════════════════════════════════════════════
+
+Reflection:
+• Inspect classes/methods/fields at runtime.
+• Used in frameworks (DI, ORM, serialization, testing).
+
+Examples:
+------------------------------------------------------------
+Class<?> c = Class.forName("java.lang.String");
+System.out.println(c.getName());
+
+for (java.lang.reflect.Method m : c.getDeclaredMethods()) {
+        // inspect methods
+}
+------------------------------------------------------------
+
+Creating objects reflectively (modern way):
+------------------------------------------------------------
+Object o = c.getConstructor().newInstance();
+------------------------------------------------------------
+
+Class loading (high level):
+• JVM loads classes on demand using class loaders.
+• Static initializers run when class is initialized.
+
+
+═════════════════════════════════════════════════════════════════════════════
+13. SERIALIZATION (AND PITFALLS)
+═════════════════════════════════════════════════════════════════════════════
+
+What is serialization?
+• Converting object state into bytes (for storage/network) and back.
+
+Key points:
+• Implement Serializable (marker interface).
+• Define serialVersionUID to control versioning.
+• Use transient to skip sensitive/non-serializable fields.
+
+Pitfalls:
+• Can be security sensitive (untrusted data)
+• Versioning issues if class structure changes
+• Prefer safer formats (JSON) for many apps unless binary required
+
+
+═════════════════════════════════════════════════════════════════════════════
+14. DEEP INTERVIEW QUESTIONS (WITH SHORT ANSWERS)
+═════════════════════════════════════════════════════════════════════════════
+
+Q1) Explain PECS in generics.
+• Producer Extends, Consumer Super.
+• Use ? extends T when you only read; use ? super T when you mainly write.
+
+Q2) Why does List<?> not allow add(T)?
+• Because compiler doesn’t know the element type; adding could violate type safety.
+
+Q3) Optional.orElse vs Optional.orElseGet?
+• orElse evaluates the default eagerly; orElseGet evaluates lazily.
+
+Q4) When can parallel streams make performance worse?
+• Small data, heavy contention, too many allocations, non-associative reduce,
+    or when work is not CPU-bound.
+
+Q5) What causes ConcurrentModificationException?
+• Structural modification of a collection while iterating with a fail-fast iterator.
+
+Q6) Why is volatile not enough for i++?
+• i++ is read-modify-write (not atomic). Use AtomicInteger or synchronization.
+
+Q7) What is type erasure and its impact?
+• Generic types removed at runtime; can’t do new T(), can’t have T[] directly.
+
+Q8) Why Integer::new is avoided now?
+• Integer(String) constructor is deprecated; use Integer.valueOf.
+
+═════════════════════════════════════════════════════════════════════════════
+
+End of advanced notes.
+
+═════════════════════════════════════════════════════════════════════════════

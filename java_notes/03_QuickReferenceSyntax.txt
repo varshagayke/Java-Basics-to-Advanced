@@ -1,0 +1,607 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║              QUICK REFERENCE GUIDE - JAVA SYNTAX CHEATSHEET                  ║
+║            Quick lookup for common Java syntax and patterns                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS:
+═════════════════════════════════════════════════════════════════════════════
+
+1. Variables and Data Types
+2. Operators
+3. Control Statements
+4. Loops
+5. Arrays
+6. Strings
+7. OOP Syntax
+8. Collections
+9. Exception Handling
+10. Modern Java (Java 8+)
+11. Modern Java (Java 9–21+)
+
+
+═════════════════════════════════════════════════════════════════════════════
+1. VARIABLES AND DATA TYPES
+═════════════════════════════════════════════════════════════════════════════
+
+Primitive Data Types:
+─────────────────────
+byte age = 25;              // 1 byte, -128 to 127
+short population = 5000;    // 2 bytes
+int salary = 50000;         // 4 bytes
+long bigNumber = 1000000L;  // 8 bytes (L suffix)
+float price = 19.99f;       // 4 bytes (f suffix)
+double rate = 3.14159;      // 8 bytes
+boolean active = true;      // true or false
+char letter = 'A';          // Single character
+
+Reference Data Types:
+─────────────────────
+String name = "John";
+Object obj = new Object();
+int[] array = {1, 2, 3};
+List<String> list = new ArrayList<>();
+
+Type Casting:
+─────────────
+int num = (int) 10.5;  // Explicit cast (narrowing)
+double num2 = 10;      // Implicit cast (widening)
+
+Constants:
+──────────
+final int MAX_SIZE = 100;
+final String APP_NAME = "MyApp";
+
+
+═════════════════════════════════════════════════════════════════════════════
+2. OPERATORS
+═════════════════════════════════════════════════════════════════════════════
+
+Arithmetic:
+───────────
+int result = 10 + 5;    // Addition
+int result = 10 - 5;    // Subtraction
+int result = 10 * 5;    // Multiplication
+int result = 10 / 5;    // Division (integer: 3/2 = 1)
+int result = 10 % 3;    // Modulus (remainder: 10 % 3 = 1)
+int num = ++i;          // Pre-increment
+int num = i++;          // Post-increment
+
+Comparison:
+───────────
+5 == 5      // true (equal)
+5 != 3      // true (not equal)
+5 > 3       // true (greater than)
+5 < 3       // false (less than)
+5 >= 5      // true
+5 <= 5      // true
+
+Logical:
+────────
+(5 > 3) && (5 < 10)  // AND (both true)
+(5 > 3) || (5 > 10)  // OR (at least one true)
+!(5 > 10)            // NOT (inverts boolean)
+
+Ternary:
+────────
+int max = (a > b) ? a : b;
+
+Assignment:
+───────────
+int x = 5;
+x += 3;  // x = x + 3
+x -= 2;  // x = x - 2
+x *= 2;  // x = x * 2
+x /= 2;  // x = x / 2
+
+
+═════════════════════════════════════════════════════════════════════════════
+3. CONTROL STATEMENTS
+═════════════════════════════════════════════════════════════════════════════
+
+If Statement:
+─────────────
+if (age > 18) {
+    System.out.println("Adult");
+}
+
+If-Else:
+─────────
+if (age > 18) {
+    System.out.println("Adult");
+} else {
+    System.out.println("Minor");
+}
+
+If-Else If-Else:
+────────────────
+if (score >= 90) {
+    System.out.println("A");
+} else if (score >= 80) {
+    System.out.println("B");
+} else {
+    System.out.println("C");
+}
+
+Switch:
+───────
+switch (day) {
+    case 1:
+        System.out.println("Monday");
+        break;
+    case 2:
+        System.out.println("Tuesday");
+        break;
+    default:
+        System.out.println("Invalid");
+}
+
+Nested If:
+──────────
+if (age > 18) {
+    if (hasLicense) {
+        System.out.println("Can drive");
+    }
+}
+
+
+═════════════════════════════════════════════════════════════════════════════
+4. LOOPS
+═════════════════════════════════════════════════════════════════════════════
+
+For Loop:
+─────────
+for (int i = 0; i < 5; i++) {
+    System.out.println(i);
+}
+
+While Loop:
+───────────
+int i = 0;
+while (i < 5) {
+    System.out.println(i);
+    i++;
+}
+
+Do-While Loop:
+──────────────
+int i = 0;
+do {
+    System.out.println(i);
+    i++;
+} while (i < 5);
+
+For-Each Loop:
+──────────────
+for (int num : numbers) {
+    System.out.println(num);
+}
+
+Break:
+──────
+for (int i = 0; i < 10; i++) {
+    if (i == 5) break;  // Exit loop
+    System.out.println(i);
+}
+
+Continue:
+─────────
+for (int i = 0; i < 5; i++) {
+    if (i == 2) continue;  // Skip iteration
+    System.out.println(i);
+}
+
+
+═════════════════════════════════════════════════════════════════════════════
+5. ARRAYS
+═════════════════════════════════════════════════════════════════════════════
+
+Declaration and Initialization:
+────────────────────────────────
+int[] array = new int[5];
+int[] array = {1, 2, 3, 4, 5};
+String[] names = {"Alice", "Bob", "Charlie"};
+
+Accessing Elements:
+────────────────────
+int first = array[0];
+array[0] = 10;
+
+Array Length:
+──────────────
+int size = array.length;
+
+Iterating:
+───────────
+for (int i = 0; i < array.length; i++) {
+    System.out.println(array[i]);
+}
+
+for (int num : array) {
+    System.out.println(num);
+}
+
+2D Array:
+─────────
+int[][] matrix = new int[3][4];
+matrix[0][0] = 1;
+int[][] matrix = {{1, 2}, {3, 4}};
+
+Common Methods:
+────────────────
+Arrays.sort(array);
+Arrays.toString(array);
+Arrays.equals(array1, array2);
+Arrays.copyOf(array, length);
+Arrays.fill(array, value);
+
+
+═════════════════════════════════════════════════════════════════════════════
+6. STRINGS
+═════════════════════════════════════════════════════════════════════════════
+
+Creating Strings:
+─────────────────
+String str = "Hello";
+String str = new String("Hello");
+
+Length:
+───────
+int len = str.length();
+
+Comparing:
+───────────
+str.equals("Hello")           // true (case-sensitive)
+str.equalsIgnoreCase("hello") // true (case-insensitive)
+str == "Hello"                // May not work (reference comparison)
+
+Substring:
+──────────
+str.substring(0, 5)  // "Hello"
+str.substring(1)     // "ello"
+
+Case Conversion:
+────────────────
+str.toUpperCase()   // "HELLO"
+str.toLowerCase()   // "hello"
+
+Character Access:
+──────────────────
+char first = str.charAt(0)  // 'H'
+
+Searching:
+──────────
+str.indexOf("l")      // 2
+str.lastIndexOf("l")  // 3
+str.contains("ell")   // true
+str.startsWith("He")  // true
+str.endsWith("lo")    // true
+
+Trimming:
+─────────
+str.trim()  // Remove leading/trailing spaces
+
+Replace:
+────────
+str.replace("l", "L")   // "HeLLo"
+str.replaceAll("l", "L") // "HeLLo"
+
+Split:
+──────
+String[] words = "Hello World".split(" ");
+
+Concatenation:
+───────────────
+String result = "Hello" + " " + "World";
+String result = str.concat(" World");
+StringBuilder sb = new StringBuilder();
+sb.append("Hello").append(" ").append("World");
+String result = sb.toString();
+
+String Formatting:
+──────────────────
+String formatted = String.format("Name: %s, Age: %d", "John", 25);
+System.out.printf("%.2f", 3.14159);  // 3.14
+
+
+═════════════════════════════════════════════════════════════════════════════
+7. OOP SYNTAX
+═════════════════════════════════════════════════════════════════════════════
+
+Class Definition:
+──────────────────
+public class Person {
+    // Fields
+    private String name;
+    private int age;
+    
+    // Constructor
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    // Method
+    public void display() {
+        System.out.println(name + ", " + age);
+    }
+}
+
+Creating Objects:
+──────────────────
+Person p = new Person("John", 25);
+
+Inheritance:
+─────────────
+public class Employee extends Person {
+    private String department;
+    
+    public Employee(String name, int age, String department) {
+        super(name, age);  // Call parent constructor
+        this.department = department;
+    }
+}
+
+Interface:
+──────────
+public interface Vehicle {
+    void start();
+    void stop();
+}
+
+public class Car implements Vehicle {
+    public void start() { /* implementation */ }
+    public void stop() { /* implementation */ }
+}
+
+Abstract Class:
+────────────────
+public abstract class Shape {
+    abstract void draw();
+}
+
+This vs Super:
+──────────────
+this.name = name;  // Refer to instance variable
+super.display();   // Call parent method
+
+Getters and Setters:
+─────────────────────
+public String getName() {
+    return name;
+}
+
+public void setName(String name) {
+    this.name = name;
+}
+
+Static Members:
+────────────────
+public class Counter {
+    private static int count = 0;
+    
+    public static int getCount() {
+        return count;
+    }
+}
+
+Access Modifiers:
+──────────────────
+public      // Accessible everywhere
+private     // Only within class
+protected   // Within class and subclasses
+            // (default) Package-private
+
+
+═════════════════════════════════════════════════════════════════════════════
+8. COLLECTIONS
+═════════════════════════════════════════════════════════════════════════════
+
+ArrayList:
+───────────
+List<String> list = new ArrayList<>();
+list.add("Item");
+list.add(0, "First");
+list.remove(0);
+list.get(0);
+list.size();
+list.contains("Item");
+
+LinkedList:
+────────────
+LinkedList<String> list = new LinkedList<>();
+list.addFirst("Start");
+list.addLast("End");
+
+HashSet:
+────────
+Set<String> set = new HashSet<>();
+set.add("Apple");
+set.add("Apple");  // Duplicate ignored
+set.remove("Apple");
+set.contains("Apple");
+
+TreeSet:
+─────────
+Set<Integer> set = new TreeSet<>();
+set.add(3);
+set.add(1);
+set.add(2);  // Automatically sorted
+
+HashMap:
+─────────
+Map<String, Integer> map = new HashMap<>();
+map.put("John", 25);
+map.get("John");  // 25
+map.remove("John");
+map.containsKey("John");
+
+Iterating Collections:
+──────────────────────
+for (String item : list) { }
+
+Iterator<String> it = list.iterator();
+while (it.hasNext()) { }
+
+list.forEach(item -> System.out.println(item));
+
+
+═════════════════════════════════════════════════════════════════════════════
+9. EXCEPTION HANDLING
+═════════════════════════════════════════════════════════════════════════════
+
+Try-Catch:
+───────────
+try {
+    int result = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println("Cannot divide by zero");
+}
+
+Try-Catch-Finally:
+──────────────────
+try {
+    // Code
+} catch (Exception e) {
+    // Handle exception
+} finally {
+    // Always executes
+}
+
+Multiple Catch:
+────────────────
+try {
+    // Code
+} catch (NullPointerException e) {
+    // Handle NPE
+} catch (ArrayIndexOutOfBoundsException e) {
+    // Handle AIOOBE
+} catch (Exception e) {
+    // Handle other exceptions
+}
+
+Throwing Exception:
+────────────────────
+throw new IllegalArgumentException("Invalid input");
+
+Custom Exception:
+──────────────────
+public class MyException extends Exception {
+    public MyException(String message) {
+        super(message);
+    }
+}
+
+Throws Declaration:
+─────────────────────
+public void readFile(String path) throws IOException {
+    // Code that might throw IOException
+}
+
+
+═════════════════════════════════════════════════════════════════════════════
+10. MODERN JAVA (Java 8+)
+═════════════════════════════════════════════════════════════════════════════
+
+Lambda Expressions:
+────────────────────
+list.forEach(item -> System.out.println(item));
+numbers.stream().map(n -> n * 2).collect(Collectors.toList());
+
+Method References:
+──────────────────
+list.forEach(System.out::println);
+list.stream().map(String::toUpperCase).collect(Collectors.toList());
+
+Streams:
+────────
+List<Integer> result = list.stream()
+    .filter(n -> n > 5)
+    .map(n -> n * 2)
+    .sorted()
+    .collect(Collectors.toList());
+
+Common Stream Operations:
+──────────────────────────
+filter(predicate)
+map(function)
+flatMap(function)
+distinct()
+sorted()
+skip(n)
+limit(n)
+forEach(action)
+collect(collector)
+reduce(initial, operator)
+count()
+findFirst()
+findAny()
+anyMatch(predicate)
+allMatch(predicate)
+
+Optional:
+──────────
+Optional<String> optional = Optional.of("value");
+optional.isPresent();
+optional.ifPresent(System.out::println);
+optional.orElse("default");
+optional.orElseGet(() -> "default");
+optional.map(String::length);
+optional.filter(s -> s.length() > 3);
+
+Functional Interfaces:
+───────────────────────
+Supplier<T> supplier = () -> value;
+Consumer<T> consumer = item -> { /* use item */ };
+Predicate<T> predicate = item -> boolean;
+Function<T, R> function = item -> result;
+UnaryOperator<T> operator = item -> result;
+BinaryOperator<T> operator = (item1, item2) -> result;
+
+
+═════════════════════════════════════════════════════════════════════════════
+11. MODERN JAVA (Java 9–21+)
+═════════════════════════════════════════════════════════════════════════════
+
+Local Variable Type Inference (var) [Java 10+]:
+──────────────────────────────────────────────
+var name = "Alice";        // inferred as String
+var list = new ArrayList<Integer>();
+
+Try-with-resources (auto-close) [Java 7+]:
+──────────────────────────────────────────────
+try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+    System.out.println(br.readLine());
+}
+
+Switch Expressions [Java 14+]:
+──────────────────────────────
+var result = switch (day) {
+    case MON, TUE, WED, THU, FRI -> "Work";
+    case SAT, SUN -> "Rest";
+};
+
+Text Blocks [Java 15+]:
+──────────────────────
+String json = """
+{
+    "name": "Alice",
+    "age": 25
+}
+""";
+
+Records (data carriers) [Java 16+]:
+──────────────────────────────────
+record Point(int x, int y) { }
+Point p = new Point(1, 2);
+
+Sealed Classes (restrict inheritance) [Java 17+]:
+──────────────────────────────────────────────
+sealed interface Shape permits Circle, Rect { }
+final class Circle implements Shape { }
+final class Rect implements Shape { }
+
+═════════════════════════════════════════════════════════════════════════════
+
+For more details, refer to comprehensive notes files.
+
+═════════════════════════════════════════════════════════════════════════════
